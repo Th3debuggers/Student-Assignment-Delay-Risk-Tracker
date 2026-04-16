@@ -1,4 +1,4 @@
-AStudent Assignment Delay & Risk Tracker
+A Student Assignment Delay & Risk Tracker
 About
 
 This project is designed to simplify how assignment progress is tracked and managed. It identifies delays, highlights at-risk submissions, and provides timely insights so both students and educators can take action before deadlines are missed.
