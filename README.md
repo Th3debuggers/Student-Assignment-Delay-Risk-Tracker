@@ -1,60 +1,37 @@
 Student Assignment Delay & Risk Tracker
-Overview
+About
 
-Student Assignment Delay & Risk Tracker is a system designed to monitor assignment progress, detect delays, and identify students or tasks at risk of late submission. It provides clear insights into deadlines, progress, and performance to support better academic planning and timely intervention.
+This project is designed to simplify how assignment progress is tracked and managed. It identifies delays, highlights at-risk submissions, and provides timely insights so both students and educators can take action before deadlines are missed.
 
-Features
-Assignment deadline tracking
-Delay detection and risk prediction
-Progress monitoring
-Alerts for upcoming or missed deadlines
-Performance insights and reporting
-Objective
+What It Does
+Tracks assignments and deadlines in one place
+Detects late or delayed submissions
+Flags high-risk assignments and students
+Provides a clear view of progress and performance
+Why This Matters
 
-The goal of this project is to improve time management and reduce last-minute submissions by proactively identifying delays and potential risks.
+Managing multiple assignments can get overwhelming. This system helps reduce missed deadlines, improve planning, and support better academic outcomes through early risk detection.
 
 Tech Stack
 Frontend: HTML, CSS, JavaScript
-Backend: Python (FastAPI / Flask)
+Backend: Python
+Framework: FastAPI / Flask
 Database: SQLite / MySQL
-Installation
-
-Clone the repository:
-
+Setup
 git clone https://github.com/your-username/student-delay-risk-tracker.git
 cd student-delay-risk-tracker
-
-Create a virtual environment:
-
 python -m venv venv
-Activate the environment:
-
-Windows:
-
 venv\Scripts\activate
-
-Mac/Linux:
-
-source venv/bin/activate
-
-Install dependencies:
-
 pip install -r requirements.txt
-
-Run the application:
-
 uvicorn main:app --reload
-Usage
+How to Use
 Add assignments with deadlines
-Track submission status
-View risk alerts and delay predictions
-Monitor student performance
-Future Enhancements
-Machine learning-based risk prediction
-Email/SMS notifications
-Advanced analytics dashboard
-Multi-user role management
-Contributing
-
-Contributions are welcome. Feel free to fork the repository and submit a pull request.
+Update submission status
+Monitor risk indicators and delays
+Review performance insights
+Future Scope
+Predictive analytics using machine learning
+Notification system for reminders
+Dashboard with detailed visualizations
+User authentication and roles
 
