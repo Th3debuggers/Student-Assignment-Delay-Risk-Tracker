@@ -29,4 +29,3 @@ Advanced analytics dashboard
 Multi-user support with roles and authentication
 
 
-If you want, I can make it even short
