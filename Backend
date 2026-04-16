@@ -1,0 +1,75 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+import pika, json, uuid, logging
+
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+logging.basicConfig(level=logging.INFO)
+
+results = {}
+
+# =========================
+# MODEL
+# =========================
+class Assignment(BaseModel):
+    student: str
+    progress: int
+    hours_studied: int
+    deadline_days: int
+
+# =========================
+# SEND TASK TO QUEUE
+# =========================
+def send_task(data):
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='tasks')
+
+    channel.basic_publish(exchange='', routing_key='tasks', body=json.dumps(data))
+    connection.close()
+
+# =========================
+# SUBMIT API
+# =========================
+@app.post("/submit")
+def submit(data: Assignment):
+    task_id = str(uuid.uuid4())
+    payload = data.dict()
+    payload["task_id"] = task_id
+
+    logging.info(f"Received: {payload}")
+
+    send_task(payload)
+    results[task_id] = "PROCESSING"
+
+    return {"task_id": task_id}
+
+# =========================
+# STATUS API
+# =========================
+@app.get("/status/{task_id}")
+def status(task_id: str):
+    return {"result": results.get(task_id, "PROCESSING")}
+
+# =========================
+# UPDATE API (FIXED)
+# =========================
+@app.post("/update")
+def update(data: dict):
+    task_id = data["task_id"]
+
+    if task_id in results and results[task_id] != "PROCESSING":
+        return {"status": "already updated"}
+
+    logging.info(f"Updated: {data}")
+
+    results[task_id] = data["result"]
+    return {"status": "ok"}
