@@ -1,31 +1,68 @@
-A Student Assignment Delay & Risk Tracker
-About
+“Track. Predict. Prevent.
+Your assignments, always on time.”
 
-This project is designed to simplify how assignment progress is tracked and managed. It identifies delays, highlights at-risk submissions, and provides timely insights so both students and educators can take action before deadlines are missed.
+# Student Assignment Delay & Risk Tracker
 
-Features
-Centralized assignment and deadline tracking
-Delay detection and risk identification
-Progress and performance monitoring
-Early alerts for potential late submissions
-Why This Matters
+# About
 
-Managing multiple assignments can become overwhelming. This system helps reduce missed deadlines, improve planning, and support better academic outcomes through early risk detection.
+This project is a web-based system that tracks assignment progress and predicts delay risk using an asynchronous, event-driven approach.
 
-Tech Stack
-Frontend: HTML, CSS, JavaScript
-Backend: Python
-Framework: FastAPI / Flask
-Database: SQLite / MySQL
-Usage
-Add and manage assignments with deadlines
-Track submission progress
-Identify delays and high-risk cases
-Monitor overall performance trends
-Future Scope
-Machine learning-based risk prediction
-Notification system for reminders
-Advanced analytics dashboard
-Multi-user support with roles and authentication
+# Features
 
+* Assignment tracking with deadlines
+* Delay and risk prediction (Low / Medium / High)
+* Asynchronous processing using queue
+* Parallel execution using multiple workers
+
+---
+
+# Architecture
+
+* Frontend sends data to backend (FastAPI)
+* Backend pushes tasks to **RabbitMQ queue**
+* Worker processes tasks asynchronously
+* Backend returns result via API
+
+---
+
+## Tech Stack
+
+* Frontend: HTML
+* Backend: Python (FastAPI)
+* Queue: RabbitMQ
+* Worker: Python
+* Database: SQLite
+
+---
+
+## Scalability
+
+* Event-driven architecture
+* Queue-based task handling
+* Multiple workers for parallel processing
+* Idempotent result updates
+
+---
+
+## Docker
+
+* Backend, worker, and RabbitMQ defined in `docker-compose.yml`
+* Runs in a single Docker network
+
+---
+
+# Usage
+
+1. Submit assignment details
+2. Backend sends task to queue
+3. Worker processes risk
+4. Check result using task ID
+
+---
+
+# Future Scope
+
+* Notification system
+* Machine learning-based prediction
+* Multi-user support
 
