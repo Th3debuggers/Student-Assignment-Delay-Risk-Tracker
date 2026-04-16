@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Assignment Risk Predictor</title>
+  <style>
+    body { font-family: Arial; background: #f4f6f8; text-align: center; }
+    .container {
+      margin-top: 80px; padding: 20px; background: white;
+      width: 320px; margin-left: auto; margin-right: auto;
+      border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input { display: block; margin: 10px auto; padding: 8px; width: 90%; }
+    button { padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; }
+    #result { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <h3>Login</h3>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="loginStatus"></p>
+
+  <hr>
+
+  <h2>Assignment Risk Predictor</h2>
+
+  <input id="student" placeholder="Student Name">
+  <input id="progress" type="number" placeholder="Progress %">
+  <input id="hours" type="number" placeholder="Hours Studied">
+  <input id="days" type="number" placeholder="Days Left">
+
+  <button onclick="checkRisk()">Check Risk</button>
+
+  <p id="result"></p>
+
+</div>
+
+<script>
+function login() {
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+  let status = document.getElementById("loginStatus");
+
+  if (user === "admin" && pass === "1234") {
+    status.innerText = "Login Successful ✅";
+    status.style.color = "green";
+  } else {
+    status.innerText = "Invalid Login ❌";
+    status.style.color = "red";
+  }
+}
+
+async function checkRisk() {
+  let data = {
+    student: document.getElementById("student").value,
+    progress: Number(document.getElementById("progress").value),
+    hours_studied: Number(document.getElementById("hours").value),
+    deadline_days: Number(document.getElementById("days").value)
+  };
+
+  if (!data.student || !data.progress || !data.deadline_days) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  let resultText = document.getElementById("result");
+  resultText.innerText = "⏳ Processing...";
+
+  try {
+    let res = await fetch("http://localhost:8000/submit", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+
+    let result = await res.json();
+
+    setTimeout(async () => {
+      let status = await fetch(`http://localhost:8000/status/${result.task_id}`);
+      let final = await status.json();
+
+      resultText.innerText = final.result;
+
+      if (final.result.includes("HIGH")) resultText.style.color = "red";
+      else if (final.result.includes("MEDIUM")) resultText.style.color = "orange";
+      else resultText.style.color = "green";
+
+    }, 3000);
+
+  } catch (err) {
+    alert("Backend not running!");
+  }
+}
+</script>
+</body>
+</html>
