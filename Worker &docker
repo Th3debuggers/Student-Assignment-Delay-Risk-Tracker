@@ -1,0 +1,104 @@
+import pika
+import json
+import time
+import requests
+import logging
+
+# =========================
+# LOGGING SETUP
+# =========================
+logging.basicConfig(level=logging.INFO)
+
+# =========================
+# PREDICTION LOGIC
+# =========================
+def predict(data):
+    score = 0
+
+    if data['progress'] < 50:
+        score += 2
+    elif data['progress'] < 70:
+        score += 1
+
+    if data['deadline_days'] <= 2:
+        score += 2
+    elif data['deadline_days'] <= 5:
+        score += 1
+
+    if data['hours_studied'] < 2:
+        score += 1
+
+    if score >= 4:
+        return "HIGH RISK - Low progress & deadline near"
+    elif score >= 2:
+        return "MEDIUM RISK - Needs improvement"
+    else:
+        return "LOW RISK - On track"
+
+# =========================
+# CALLBACK FUNCTION
+# =========================
+def callback(ch, method, properties, body):
+    try:
+        data = json.loads(body)
+
+        logging.info(f"Processing task: {data}")
+
+        result = predict(data)
+        time.sleep(2)
+
+        logging.info(f"Prediction result: {result}")
+
+        # send result to backend
+        requests.post("http://localhost:8000/update", json={
+            "task_id": data["task_id"],
+            "result": result
+        })
+
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    except Exception as e:
+        logging.error(f"Error processing task: {e}")
+
+# =========================
+# RABBITMQ CONNECTION
+# =========================
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host='localhost')
+)
+
+channel = connection.channel()
+channel.queue_declare(queue='tasks')
+
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(queue='tasks', on_message_callback=callback)
+
+logging.info("🚀 Worker started and waiting for tasks...")
+
+channel.start_consuming()
+
+
+
+version: "3.9"
+
+services:
+
+  backend:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+
+  worker:
+    build: .
+    command: python worker.py
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
